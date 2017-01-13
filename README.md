@@ -1,2 +1,10 @@
 # RainbowTable
-Implementation of a (simple) Rainbow Table for educational purposes
+Implementation of a (simple) Rainbow Table for educational purposes. This code is simply meant as an educational tool and is not optimized, collision resistant or clean. Cryptographers and fans of clean code look away now.
+
+Rainbow tables are a method to perform quick cryptanalysis. They split the difference between a brute force attack (heavy on time, light on storage) and a lookup table ((possibly) light on time, heavy on storage), to allow an attacker to crack some hash, usually the hash of an unsalted password.
+
+Firstly, the attacker chooses a hash and reduction function, the reduction function can be something quite simple. I have chosen to simply take the first 5 characters of a hash. Note, in a rainbow table there are usually multiple reduction functions to decrease the chance of a collision, for simplicity I have used one. It is necessary for the attacker to already know the hash function that was originally used for the hashed passwords they want to crack. The attacker starts with some plaintext values, in mine I have ```{"12345678", "password", "testtestest", "passwrd123", "123456789"}```, for each plaintext they iterate between a new hash and a new reduction for some number of cycles. They then store the final hash. So now we have some plaintexts and their final hashes after a number of cycles. I chose a small number of 100 cycles, meaning I can capture 500 passwords. 
+
+Given some hash to crack, the attacker checks if the hash is a match for any of the final stored hash values. If it is not, reduce and hash until it is (this may not terminate so pick a length of time you are willing to wait to find out). If it is, go the first plaintext in the chain, and reduce and hash until the hash matches the hash the attacker would like to crack, the previous reduction is then the plaintext. 
+
+For example, running ```./rainbow_table 8dbc79a1c588f4e0``` will correctly find the plaintext ```b9351```, but ```./rainbow_table 32b999a1c588f4e0``` will result in no matches, since ```32b999a1c588f4e0``` was not any of the 500 possible hashes. 
